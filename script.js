@@ -95,7 +95,7 @@ function render() {
   document.getElementById('btn-next').disabled = page >= totalP - 1;
 
   drawCandles(slice);
-  renderTable();
+  renderTable(slice);
 }
 
 function goPage(d) { page += d; render(); }
@@ -164,10 +164,10 @@ function drawCandles(slice) {
   document.getElementById('csvg').innerHTML = parts.join('');
 }
 
-function renderTable() {
+function renderTable(slice) {
   const tb = document.getElementById('tbody');
-  if (!data.length) { tb.innerHTML = '<tr><td colspan="7" class="empty">Sin datos</td></tr>'; return; }
-  tb.innerHTML = [...data].reverse().map(r => {
+  if (!slice || !slice.length) { tb.innerHTML = '<tr><td colspan="7" class="empty">Sin datos</td></tr>'; return; }
+  tb.innerHTML = [...slice].reverse().map(r => {
     const nom = r.max - r.min;
     const pct = (nom / r.min * 100).toFixed(2);
     const al = alerts(r.min, r.max);
