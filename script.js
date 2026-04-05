@@ -98,6 +98,42 @@ function render() {
   renderTable(slice);
 }
 
+function switchTab(t) {
+  document.getElementById('tab-panel').style.display = t === 'panel' ? 'block' : 'none';
+  document.getElementById('tab-search').style.display = t === 'search' ? 'block' : 'none';
+  const btns = document.querySelectorAll('.tab-btn');
+  btns[0].classList.toggle('active', t === 'panel');
+  btns[1].classList.toggle('active', t === 'search');
+}
+
+function searchLevel() {
+  const v = parseFloat(document.getElementById('s-val').value);
+  const wrap = document.getElementById('search-results-wrap');
+  const tbody = document.getElementById('s-tbody');
+  if (isNaN(v)) { wrap.style.display = 'none'; return; }
+  
+  const res = data.filter(r => v >= r.min && v <= r.max);
+  wrap.style.display = 'block';
+  
+  if (!res.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">No se encontraron días que contengan ese nivel de precio</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = res.sort((a,b) => b.ts - a.ts).map(r => {
+    const pct = ((r.max - r.min) / r.min * 100).toFixed(2);
+    const al = alerts(r.min, r.max);
+    const badges = al.map(a => `<span class="badge ${a === A1 ? 'b1' : 'b2'}">${a.toLocaleString('es-AR')}</span>`).join('');
+    return `<tr>
+      <td>${r.fecha}</td>
+      <td>${fmt(r.min)}</td>
+      <td>${fmt(r.max)}</td>
+      <td>${pct}%</td>
+      <td>${badges || '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
 function goPage(d) { page += d; render(); }
 
 function drawCandles(slice) {
