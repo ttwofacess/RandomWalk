@@ -53,6 +53,13 @@ function delEntry(ts) {
   render();
 }
 
+function clearAll() {
+  if (!confirm('¿Estás seguro de que quieres borrar TODOS los datos? Esta acción no se puede deshacer.')) return;
+  data = [];
+  save();
+  render();
+}
+
 function alerts(mn, mx) {
   const a = [];
   if (mn <= A1 && A1 <= mx) a.push(A1);
