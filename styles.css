@@ -9,6 +9,10 @@
   .sec-title{font-size:11px;font-weight:600;color:#888780;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
   .sec-title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
   .sec-title-row .sec-title{margin-bottom:0}
+  .actions{display:flex;gap:6px}
+  .action-btn{padding:4px 10px;font-size:11px;font-weight:600;border:1px solid #d3d1c7;border-radius:6px;background:#fff;color:#5f5e5a;cursor:pointer;text-transform:uppercase;letter-spacing:.03em;transition:all .2s}
+  .action-btn:hover:not(:disabled){background:#f9f9f7;border-color:#888780;color:#2c2c2a}
+  .action-btn:disabled, .clear-btn:disabled{opacity:.4;cursor:default;filter:grayscale(1)}
   .clear-btn{padding:4px 8px;font-size:11px;font-weight:600;border:1px solid #d3d1c7;border-radius:6px;background:#fff;color:#a32d2d;cursor:pointer;text-transform:uppercase;letter-spacing:.03em;transition:all .2s}
   .clear-btn:active{background:#fcebeb;border-color:#a32d2d}
   .form-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}

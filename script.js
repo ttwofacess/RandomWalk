@@ -60,6 +60,49 @@ function clearAll() {
   render();
 }
 
+function exportData() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const now = new Date();
+  const dateStr = now.toISOString().split('T')[0];
+  a.href = url;
+  a.download = `eth-history-${dateStr}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData() {
+  document.getElementById('import-file').click();
+}
+
+function handleImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!Array.isArray(imported)) throw new Error();
+      
+      const prevLen = data.length;
+      imported.forEach(row => {
+        if (!data.find(r => r.ts === row.ts)) {
+          data.push(row);
+        }
+      });
+      data.sort((a, b) => a.ts - b.ts);
+      save();
+      render();
+      alert(`Importación completada. Se añadieron ${data.length - prevLen} nuevos registros.`);
+    } catch(err) {
+      alert('Error: El archivo no tiene un formato válido.');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
 function alerts(mn, mx) {
   const a = [];
   if (mn <= A1 && A1 <= mx) a.push(A1);
@@ -75,9 +118,18 @@ function render() {
   const hasData = data.length > 0;
   document.getElementById('metrics-wrap').style.display = hasData ? 'block' : 'none';
   document.getElementById('chart-wrap').style.display = hasData ? 'block' : 'none';
-  document.getElementById('table-wrap').style.display = hasData ? 'block' : 'none';
+  
+  // Historial siempre visible para que el botón de importar esté accesible
+  document.getElementById('table-wrap').style.display = 'block';
+
+  // Deshabilitar botones que requieren datos
+  const exportBtn = document.querySelector('button[onclick="exportData()"]');
+  const clearBtn = document.querySelector('button[onclick="clearAll()"]');
+  if (exportBtn) exportBtn.disabled = !hasData;
+  if (clearBtn) clearBtn.disabled = !hasData;
+
   if (!hasData) {
-    document.getElementById('tbody').innerHTML = '<tr><td colspan="7" class="empty">Sin datos cargados</td></tr>';
+    document.getElementById('tbody').innerHTML = '<tr><td colspan="7" class="empty">Sin datos cargados. Podés importar un respaldo o agregar nuevos registros arriba.</td></tr>';
     return;
   }
 

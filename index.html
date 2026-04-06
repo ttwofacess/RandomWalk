@@ -63,10 +63,15 @@
     </div>
   </div>
 
-  <div class="card" id="table-wrap" style="display:none">
+  <div class="card" id="table-wrap">
     <div class="sec-title-row">
       <div class="sec-title">Historial</div>
-      <button class="clear-btn" onclick="clearAll()">Borrar todo</button>
+      <div class="actions">
+        <button class="action-btn" onclick="exportData()">Exportar</button>
+        <button class="action-btn" onclick="importData()">Importar</button>
+        <button class="clear-btn" onclick="clearAll()">Borrar todo</button>
+      </div>
+      <input type="file" id="import-file" style="display:none" accept=".json" onchange="handleImport(event)">
     </div>
     <div class="table-wrap">
       <table>
