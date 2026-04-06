@@ -118,9 +118,18 @@ function render() {
   const hasData = data.length > 0;
   document.getElementById('metrics-wrap').style.display = hasData ? 'block' : 'none';
   document.getElementById('chart-wrap').style.display = hasData ? 'block' : 'none';
-  document.getElementById('table-wrap').style.display = hasData ? 'block' : 'none';
+  
+  // Historial siempre visible para que el botón de importar esté accesible
+  document.getElementById('table-wrap').style.display = 'block';
+
+  // Deshabilitar botones que requieren datos
+  const exportBtn = document.querySelector('button[onclick="exportData()"]');
+  const clearBtn = document.querySelector('button[onclick="clearAll()"]');
+  if (exportBtn) exportBtn.disabled = !hasData;
+  if (clearBtn) clearBtn.disabled = !hasData;
+
   if (!hasData) {
-    document.getElementById('tbody').innerHTML = '<tr><td colspan="7" class="empty">Sin datos cargados</td></tr>';
+    document.getElementById('tbody').innerHTML = '<tr><td colspan="7" class="empty">Sin datos cargados. Podés importar un respaldo o agregar nuevos registros arriba.</td></tr>';
     return;
   }
 
