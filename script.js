@@ -167,15 +167,38 @@ function switchTab(t) {
 
 function searchLevel() {
   const v = parseFloat(document.getElementById('s-val').value);
+  if (isNaN(v)) { 
+    document.getElementById('search-results-wrap').style.display = 'none'; 
+    return; 
+  }
+  const res = data.filter(r => v >= r.min && v <= r.max);
+  renderSearchResults(res, `Resultados para el nivel ${fmt(v)}`);
+}
+
+function searchLowestMin() {
+  if (!data.length) return;
+  const minVal = Math.min(...data.map(r => r.min));
+  const res = data.filter(r => r.min === minVal);
+  renderSearchResults(res, `Menor Mínimo Histórico: ${fmt(minVal)}`);
+}
+
+function searchHighestMax() {
+  if (!data.length) return;
+  const maxVal = Math.max(...data.map(r => r.max));
+  const res = data.filter(r => r.max === maxVal);
+  renderSearchResults(res, `Mayor Máximo Histórico: ${fmt(maxVal)}`);
+}
+
+function renderSearchResults(res, title) {
   const wrap = document.getElementById('search-results-wrap');
   const tbody = document.getElementById('s-tbody');
-  if (isNaN(v)) { wrap.style.display = 'none'; return; }
+  const titleEl = wrap.querySelector('.sec-title');
   
-  const res = data.filter(r => v >= r.min && v <= r.max);
+  titleEl.textContent = title;
   wrap.style.display = 'block';
   
   if (!res.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty">No se encontraron días que contengan ese nivel de precio</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">No se encontraron registros</td></tr>';
     return;
   }
   

@@ -95,6 +95,15 @@
       </div>
       <button class="add-btn" onclick="searchLevel()">Buscar coincidencias</button>
     </div>
+    <div class="form-row" style="margin-top:12px; border-top:1px solid #f0ede8; padding-top:12px">
+      <div class="field">
+        <label>Búsquedas rápidas</label>
+        <div style="display:flex; gap:8px">
+          <button class="action-btn" onclick="searchLowestMin()" style="padding: 8px 12px; font-size:13px">Menor Mínimo</button>
+          <button class="action-btn" onclick="searchHighestMax()" style="padding: 8px 12px; font-size:13px">Mayor Máximo</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="card" id="search-results-wrap" style="display:none">
