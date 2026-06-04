@@ -4,6 +4,7 @@ import { initData, addEntry, deleteEntry, clearAllEntries } from './dataService.
 import { exportData, importData, handleImport } from './importExport.js';
 import { render, goPage, switchTab, setPage } from './ui.js';
 import { searchLevel, searchLowestMin, searchHighestMax } from './searchRenderer.js';
+import { sanitizeFecha } from './validator.js';
 
 // Inicialización
 initData(loadData());
@@ -11,7 +12,8 @@ initData(loadData());
 // Exponer funciones al scope global para los onclick del HTML
 window.switchTab = switchTab;
 window.addEntry = function() {
-  const fv = document.getElementById('f-fecha').value;
+  const fel = document.getElementById('f-fecha');
+  const fv = sanitizeFecha(fel.value);
   const minv = parseFloat(document.getElementById('f-min').value);
   const maxv = parseFloat(document.getElementById('f-max').value);
   const errEl = document.getElementById('err');
@@ -19,7 +21,7 @@ window.addEntry = function() {
   
   const res = addEntry(fv, minv, maxv);
   if (res.ok) {
-    document.getElementById('f-fecha').value = '';
+    fel.value = '';
     document.getElementById('f-min').value = '';
     document.getElementById('f-max').value = '';
     setPage(Math.floor(res.index / PAGE));
@@ -64,13 +66,7 @@ window.searchHighestMax = searchHighestMax;
 
 // Listeners: auto-formato de fecha
 document.getElementById('f-fecha').addEventListener('input', function() {
-  const digits = this.value.replace(/[^0-9]/g, '');
-  let out = '';
-  for (let i = 0; i < digits.length && i < 8; i++) {
-    if (i === 2 || i === 4) out += '/';
-    out += digits[i];
-  }
-  this.value = out;
+  this.value = sanitizeFecha(this.value);
 });
 
 // Enter para navegar entre campos
