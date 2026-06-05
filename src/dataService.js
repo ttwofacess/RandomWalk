@@ -47,8 +47,8 @@ export function clearAllEntries() {
 
 export function getAlerts(mn, mx) {
   const a = [];
-  if (mn <= A1 && A1 <= mx) a.push(A1);
-  if (mn <= A2 && A2 <= mx) a.push(A2);
+  if (mn <= A1) a.push(A1);
+  if (mx >= A2) a.push(A2);
   return a;
 }
 
