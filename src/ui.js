@@ -59,7 +59,7 @@ export function render() {
   document.getElementById('btn-prev').disabled = page === 0;
   document.getElementById('btn-next').disabled = page >= totalP - 1;
 
-  drawCandles(slice);
+  drawCandles(slice, maSlice);
   renderTable(slice, maSlice);
 }
 

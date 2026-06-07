@@ -1,12 +1,16 @@
 import { A1, A2 } from './config.js';
 import { getAlerts } from './dataService.js';
 
-export function drawCandles(slice) {
+export function drawCandles(slice, maSlice) {
   const W = 540, H = 280, padL = 58, padR = 16, padT = 18, padB = 36;
   const plotW = W - padL - padR, plotH = H - padT - padB;
   const n = slice.length;
 
   const allVals = slice.flatMap(r => [r.min, r.max]).concat([A1, A2]);
+  if (maSlice) {
+    maSlice.forEach(m => { if (m) allVals.push(m.value); });
+  }
+  
   const dMin = Math.min(...allVals), dMax = Math.max(...allVals);
   const span = dMax - dMin || 1;
   const yBuf = span * 0.08;
@@ -36,6 +40,21 @@ export function drawCandles(slice) {
     parts.push(`<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W - padR}" y2="${y.toFixed(1)}" stroke="${col}" stroke-width="1.2" stroke-dasharray="5,3"/>`);
     parts.push(`<text x="${(W - padR - 2).toFixed(1)}" y="${(y - 3).toFixed(1)}" text-anchor="end" font-size="9" font-weight="bold" fill="${col}">${lvl.toLocaleString('es-AR')}</text>`);
   });
+
+  // Línea de Media Móvil (MA)
+  if (maSlice && maSlice.length > 1) {
+    let points = [];
+    maSlice.forEach((m, i) => {
+      if (m) {
+        const cx = padL + colW * i + colW / 2;
+        const cy = yPx(m.value);
+        points.push(`${cx.toFixed(1)},${cy.toFixed(1)}`);
+      }
+    });
+    if (points.length > 1) {
+      parts.push(`<polyline points="${points.join(' ')}" fill="none" stroke="#4A90E2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`);
+    }
+  }
 
   // Velas
   slice.forEach((r, i) => {
