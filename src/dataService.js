@@ -52,6 +52,22 @@ export function getAlerts(mn, mx) {
   return a;
 }
 
+export function calculateMovingAverage(period = 50) {
+  const ma = [];
+  for (let i = 0; i < data.length; i++) {
+    const start = Math.max(0, i - period + 1);
+    const window = data.slice(start, i + 1);
+    const sum = window.reduce((acc, curr) => acc + (curr.min + curr.max) / 2, 0);
+    const value = sum / window.length;
+    ma.push({
+      value,
+      isPartial: window.length < period,
+      count: window.length
+    });
+  }
+  return ma;
+}
+
 export function mergeEntries(imported) {
   const prevLen = data.length;
   imported.forEach(row => {
