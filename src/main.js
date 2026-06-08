@@ -4,7 +4,7 @@ import { initData, addEntry, deleteEntry, clearAllEntries } from './dataService.
 import { exportData, importData, handleImport } from './importExport.js';
 import { render, goPage, switchTab, setPage } from './ui.js';
 import { searchLevel, searchLowestMin, searchHighestMax } from './searchRenderer.js';
-import { sanitizeFecha } from './validator.js';
+import { sanitizeFecha, sanitizePrecio } from './validator.js';
 
 // Inicialización
 initData(loadData());
@@ -14,8 +14,8 @@ window.switchTab = switchTab;
 window.addEntry = function() {
   const fel = document.getElementById('f-fecha');
   const fv = sanitizeFecha(fel.value);
-  const minv = parseFloat(document.getElementById('f-min').value);
-  const maxv = parseFloat(document.getElementById('f-max').value);
+  const minv = parseFloat(sanitizePrecio(document.getElementById('f-min').value));
+  const maxv = parseFloat(sanitizePrecio(document.getElementById('f-max').value));
   const errEl = document.getElementById('err');
   errEl.textContent = '';
   
@@ -64,9 +64,18 @@ window.searchLevel = function() {
 window.searchLowestMin = searchLowestMin;
 window.searchHighestMax = searchHighestMax;
 
-// Listeners: auto-formato de fecha
+// Listeners: auto-formato de fecha y sanitización de precios
 document.getElementById('f-fecha').addEventListener('input', function() {
   this.value = sanitizeFecha(this.value);
+});
+
+['f-min', 'f-max', 's-val'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('input', function() {
+      this.value = sanitizePrecio(this.value);
+    });
+  }
 });
 
 // Enter para navegar entre campos
