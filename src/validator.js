@@ -39,3 +39,27 @@ export function parseFecha(s) {
   
   return { ts: dt.getTime(), str: cleanStr };
 }
+
+/**
+ * Sanitiza un valor numérico permitiendo solo dígitos y un punto decimal.
+ */
+export function sanitizePrecio(s) {
+  if (typeof s !== 'string') return '';
+  // Remover todo lo que no sea dígito o punto
+  let out = s.replace(/[^0-9.]/g, '');
+  // Asegurar que solo haya un punto decimal
+  const parts = out.split('.');
+  if (parts.length > 2) {
+    out = parts[0] + '.' + parts.slice(1).join('');
+  }
+  return out;
+}
+
+/**
+ * Parsea un valor numérico y valida que sea positivo.
+ */
+export function parsePrecio(s) {
+  const v = parseFloat(s);
+  if (isNaN(v) || v <= 0) return null;
+  return v;
+}

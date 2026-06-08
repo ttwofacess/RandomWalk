@@ -1,6 +1,6 @@
 import { A1, A2 } from './config.js';
 import { saveData } from './storage.js';
-import { parseFecha } from './validator.js';
+import { parseFecha, parsePrecio } from './validator.js';
 
 let data = [];
 
@@ -17,17 +17,21 @@ export function addEntry(fechaStr, min, max) {
   if (!dt) {
     return { ok: false, error: 'Fecha inválida o fin de semana. Usar dd/mm/aaaa, sólo días hábiles.' };
   }
-  if (isNaN(min) || isNaN(max)) {
-    return { ok: false, error: 'Ingresá valores numéricos válidos.' };
+  
+  const pMin = parsePrecio(min);
+  const pMax = parsePrecio(max);
+  
+  if (pMin === null || pMax === null) {
+    return { ok: false, error: 'Ingresá valores numéricos válidos y positivos.' };
   }
-  if (min >= max) {
+  if (pMin >= pMax) {
     return { ok: false, error: 'El mínimo debe ser menor que el máximo.' };
   }
   if (data.find(r => r.ts === dt.ts)) {
     return { ok: false, error: 'Ya existe un registro para esa fecha.' };
   }
   
-  data.push({ ts: dt.ts, fecha: dt.str, min, max });
+  data.push({ ts: dt.ts, fecha: dt.str, min: pMin, max: pMax });
   data.sort((a, b) => a.ts - b.ts);
   saveData(data);
   
