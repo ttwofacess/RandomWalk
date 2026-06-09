@@ -4,7 +4,7 @@ import { initData, addEntry, deleteEntry, clearAllEntries } from './dataService.
 import { exportData, importData, handleImport } from './importExport.js';
 import { render, goPage, switchTab, setPage } from './ui.js';
 import { searchLevel, searchLowestMin, searchHighestMax } from './searchRenderer.js';
-import { sanitizeFecha, sanitizePrecio } from './validator.js';
+import { sanitizeFecha, sanitizePrecio, parsePrecio } from './validator.js';
 
 // Inicialización
 initData(loadData());
@@ -14,8 +14,8 @@ window.switchTab = switchTab;
 window.addEntry = function() {
   const fel = document.getElementById('f-fecha');
   const fv = sanitizeFecha(fel.value);
-  const minv = parseFloat(sanitizePrecio(document.getElementById('f-min').value));
-  const maxv = parseFloat(sanitizePrecio(document.getElementById('f-max').value));
+  const minv = parsePrecio(document.getElementById('f-min').value);
+  const maxv = parsePrecio(document.getElementById('f-max').value);
   const errEl = document.getElementById('err');
   errEl.textContent = '';
   
@@ -58,8 +58,9 @@ window.handleImport = function(e) {
 
 window.goPage = goPage;
 window.searchLevel = function() {
-  const v = parseFloat(document.getElementById('s-val').value);
-  searchLevel(v);
+  const raw = document.getElementById('s-val').value;
+  const v = parsePrecio(raw);
+  searchLevel(v !== null ? v : NaN);
 };
 window.searchLowestMin = searchLowestMin;
 window.searchHighestMax = searchHighestMax;
