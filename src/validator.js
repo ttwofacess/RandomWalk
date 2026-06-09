@@ -42,11 +42,14 @@ export function parseFecha(s) {
 
 /**
  * Sanitiza un valor numérico permitiendo solo dígitos y un punto decimal.
+ * También convierte comas en puntos.
  */
 export function sanitizePrecio(s) {
   if (typeof s !== 'string') return '';
+  // Convertir comas a puntos
+  let out = s.replace(/,/g, '.');
   // Remover todo lo que no sea dígito o punto
-  let out = s.replace(/[^0-9.]/g, '');
+  out = out.replace(/[^0-9.]/g, '');
   // Asegurar que solo haya un punto decimal
   const parts = out.split('.');
   if (parts.length > 2) {
