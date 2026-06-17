@@ -1,5 +1,21 @@
-import { A1, A2 } from './config.js';
+import {
+  A1,
+  A2,
+  HIGH_PROBABILITY_REVERSAL_DEVIATION_PCT,
+  HIGH_PROBABILITY_REVERSAL_MARKER_COLOR,
+  REVERSAL_DEVIATION_PCT,
+  REVERSAL_MARKER_COLOR
+} from './config.js';
 import { getAlerts } from './dataService.js';
+
+function getMidPrice(row) {
+  return (row.min + row.max) / 2;
+}
+
+function getReversalDeviationPct(row, ma) {
+  if (!ma || !ma.value) return 0;
+  return Math.abs((getMidPrice(row) - ma.value) / ma.value) * 100;
+}
 
 export function drawCandles(slice, maSlice) {
   const W = 540, H = 280, padL = 58, padR = 16, padT = 18, padB = 36;
@@ -63,6 +79,10 @@ export function drawCandles(slice, maSlice) {
     const rectH = Math.max(yBot - yTop, 2);
     const hasAlert = getAlerts(r.min, r.max).length > 0;
     const col = hasAlert ? '#D85A30' : '#1D9E75';
+    const ma = maSlice ? maSlice[i] : null;
+    const reversalDeviation = getReversalDeviationPct(r, ma);
+    const hasReversalAlert = reversalDeviation >= REVERSAL_DEVIATION_PCT;
+    const hasHighProbabilityReversalAlert = reversalDeviation >= HIGH_PROBABILITY_REVERSAL_DEVIATION_PCT;
 
     parts.push(`<line x1="${cx.toFixed(1)}" y1="${(yTop - 5).toFixed(1)}" x2="${cx.toFixed(1)}" y2="${yTop.toFixed(1)}" stroke="${col}" stroke-width="1.5"/>`);
     parts.push(`<line x1="${cx.toFixed(1)}" y1="${yBot.toFixed(1)}" x2="${cx.toFixed(1)}" y2="${(yBot + 5).toFixed(1)}" stroke="${col}" stroke-width="1.5"/>`);
@@ -72,6 +92,28 @@ export function drawCandles(slice, maSlice) {
       parts.push(`<circle cx="${cx.toFixed(1)}" cy="${(yTop - 12).toFixed(1)}" r="5" fill="#A32D2D"/>`);
       parts.push(`<text x="${cx.toFixed(1)}" y="${(yTop - 8.5).toFixed(1)}" text-anchor="middle" font-size="8" font-weight="bold" fill="#fff">!</text>`);
     }
+
+    [
+      {
+        active: hasHighProbabilityReversalAlert,
+        color: HIGH_PROBABILITY_REVERSAL_MARKER_COLOR,
+        fill: '#2b2b2b',
+        label: 'High Probability of Reversal',
+        text: 'H'
+      },
+      {
+        active: hasReversalAlert,
+        color: REVERSAL_MARKER_COLOR,
+        fill: '#fff',
+        label: 'Possible reversal',
+        text: 'R'
+      }
+    ].filter(marker => marker.active).forEach((marker, markerIndex) => {
+      const requestedY = yTop - (hasAlert ? 27 : 14) - markerIndex * 14;
+      const markerY = requestedY >= padT + 7 ? requestedY : padT + 7 + markerIndex * 14;
+      parts.push(`<circle cx="${cx.toFixed(1)}" cy="${markerY.toFixed(1)}" r="6" fill="${marker.color}"><title>${marker.label}: ${reversalDeviation.toFixed(1)}% deviation from PM 50</title></circle>`);
+      parts.push(`<text x="${cx.toFixed(1)}" y="${(markerY + 3).toFixed(1)}" text-anchor="middle" font-size="8" font-weight="bold" fill="${marker.fill}">${marker.text}</text>`);
+    });
 
     // Etiquetas eje X
     const fp = r.fecha.split('/');
